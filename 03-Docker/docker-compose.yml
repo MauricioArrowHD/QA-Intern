@@ -1,0 +1,37 @@
+services:
+  api:
+    build: ./api
+    ports:
+      - "8080:3000"
+    environment:
+      DB_HOST: db
+      REDIS_HOST: cache
+    networks:
+      - backend
+    depends_on:
+      - db
+      - cache
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: shop
+      POSTGRES_DB: shop
+    volumes:
+      - dbdata:/var/lib/postgres
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - db_net
+
+  cache:
+    image: redis:7
+    networks:
+      - backend
+
+networks:
+  backend:
+  db_net:
+
+volumes:
+  dbdata:
